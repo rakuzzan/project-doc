@@ -27,7 +27,8 @@ System_Boundary(loyaltySystemBoundary, "Система лояльности") {
 }
 
 System_Ext(externalPaymentGateway, "Платёжный шлюз", "Обработка внешних платёжных операций.")
-System_Ext(externalEmailService, "Сервис email уведомлений", "Отправка уведомлений пользователям о событиях.")
+System_Ext(externalEmailService, "Сервис email уведомлений", "Отправка уведомлений пользователям.")
+System_Ext(externalPushService, "Сервис push-уведомлений", "Отправка уведомлений пользователям.")
 
 client --> mobileApp : Использует
 admin --> webApp : Управляет
@@ -39,6 +40,7 @@ microservices --> database : Читает / пишет данные
 
 transactionService --> externalPaymentGateway : Взаимодействие с внешним платёжным шлюзом
 notificationService --> externalEmailService : Отправка email уведомлений
+notificationService --> externalPushService : Отправка push-уведомлений
 
 rewardService --> transactionService : Получает данные о транзакциях для начислений
 

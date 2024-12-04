@@ -14,7 +14,9 @@ Admin ---> loyaltySystem
 
 System_Ext(storeApi, "Платежная система магазина", "Предоставляет данные о транзакции")
 System_Ext(emailService, "email сервис", "Отправка уведомлений")
+System_Ext(pushService, "сервис push-уведомлений", "Отправка уведомлений")
 
 loyaltySystem --> storeApi
 loyaltySystem --> emailService
+loyaltySystem --> pushService
 @enduml
