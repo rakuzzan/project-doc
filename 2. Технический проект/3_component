@@ -1,0 +1,28 @@
+@startuml
+title "C4. Компоненты"
+
+!include <C4/C4_Component>
+
+Container_Boundary(transactionService, "Сервис транзакций") {
+    Component(controller, "TransactionController", "Go", "Обработка входящих HTTP запросов.")
+    Component(service, "TransactionService", "Go", "Основная бизнес-логика обработки транзакций: \nсоздание, проверка, обновление статуса транзакций. Взаимодействует с внешними платёжными шлюзами для подтверждения транзакций.")
+    Component(repository, "TransactionRepository", "Go", "Обеспечивает доступ к базе данных для хранения и извлечения информации о транзакциях.")
+    Component(eventPublisher, "EventPublisher", "Go", "Отправка событий о завершении транзакций в RabbitMQ для последующей обработки другими сервисами.")
+}
+
+ContainerDb(database, "База данных PostgreSQL", "PostgreSQL", "Хранение данных о транзакциях: \nвключает детали, статусы и историю операций.")
+
+Container(messageBroker, "RabbitMQ", "Брокер сообщений", "Передача событий завершения транзакций другим сервисам для дальнейшей обработки (например, начисления баллов).")
+
+Component_Ext(rewardService, "Сервис начислений", "Go", "Обрабатывает начисление баллов на основании завершённых транзакций.")
+Component_Ext(paymentGateway, "Платежный шлюз", "Внешняя система", "Обработка внешних платежей и подтверждений транзакций.")
+
+controller --> service : Делегирует запросы
+service --> repository : Чтение и запись данных о транзакциях
+service --> eventPublisher : Генерация событий о завершении транзакции
+repository --> database : Хранение и извлечение данных
+eventPublisher --> messageBroker : Публикация событий транзакций
+service --> paymentGateway : Взаимодействие с внешним платежным шлюзом для подтверждения транзакций
+messageBroker --> rewardService : Уведомление о завершённых транзакциях для начисления баллов
+
+@enduml
