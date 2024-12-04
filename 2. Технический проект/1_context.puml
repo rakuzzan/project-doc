@@ -1,0 +1,18 @@
+@startuml
+title "C4. Контекст"
+
+!include <C4/C4_Container>
+
+Person(Client, "Клиент", "Использует систему лояльности для накопления баллов")
+Person(Manager, "Менеджер", "Управляет акциями магазина")
+Person(Admin, "Администратор", "Управление учетными записями пользователей, настройка системы")
+
+System(loyaltySystem, "Система лояльности")
+Client ---> loyaltySystem
+Manager ---> loyaltySystem
+Admin ---> loyaltySystem
+
+System_Ext(storeApi, "Платежная система магазина", "Предоставляет данные о транзакции")
+
+loyaltySystem --> storeApi
+@enduml
