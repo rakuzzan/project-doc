@@ -1,0 +1,47 @@
+@startuml
+title "C4. Контейнеры"
+
+!include <C4/C4_Container>
+
+Person(client, "Клиент", "Использует мобильное приложение для накопления баллов и просмотра предложений.")
+Person(admin, "Администратор", "Управляет системой лояльности через веб-приложение.")
+Person(manager, "Менеджер магазина", "Управляет акциями магазина через интерфейс для менеджеров.")
+
+System_Boundary(loyaltySystemBoundary, "Система лояльности") {
+    Container(mobileApp, "Мобильное приложение", "iOS/Android", "Приложение для клиентов для накопления баллов и взаимодействия с системой лояльности.")
+    Container(webApp, "Веб-приложение для администраторов", "Web", "Приложение для администраторов для управления системой лояльности.")
+    
+    Container(microservices, "Микросервисная архитектура", "Go", "Серверная часть, обработка логики системы лояльности через микросервисы.") {
+        Container(userService, "Сервис пользователей", "Go", "Управление данными о пользователях.")
+        Container(rewardService, "Сервис начислений", "Go", "Обработка начислений баллов и бонусов.")
+        Container(campaignService, "Сервис акций", "Go", "Управление акциями и предложениями.")
+        Container(transactionService, "Сервис транзакций", "Go", "Обработка платежей, транзакций и взаимодействие с внешними платёжными системами.")
+        Container(notificationService, "Сервис уведомлений", "Go", "Отправка уведомлений пользователям о начислениях и акциях.")
+        Container(storeService, "Сервис магазина", "Go", "Управление данными о магазинах, товарах и акциях магазина.")
+        Container(loyaltySystemService, "Сервис системы лояльности", "Go", "Обработка логики начисления и использования баллов лояльности.")
+    }
+    
+    ContainerDb(database, "База данных PostgreSQL", "PostgreSQL", "Хранит данные о пользователях, транзакциях, акциях и баллах.")
+    
+    Container(messageBroker, "RabbitMQ", "Брокер сообщений", "Обмен событиями между микросервисами.")
+}
+
+System_Ext(externalPaymentGateway, "Платёжный шлюз", "Обработка внешних платёжных операций.")
+System_Ext(externalEmailService, "Сервис email уведомлений", "Отправка уведомлений пользователям о событиях.")
+
+client --> mobileApp : Использует
+admin --> webApp : Управляет
+manager --> webApp : Управляет акциями магазина
+
+mobileApp --> microservices : Запросы о баллах, начислениях
+webApp --> microservices : Управление системой, отчетность
+microservices --> database : Читает / пишет данные
+
+transactionService --> externalPaymentGateway : Взаимодействие с внешним платёжным шлюзом
+notificationService --> externalEmailService : Отправка email уведомлений
+
+rewardService --> transactionService : Получает данные о транзакциях для начислений
+
+microservices --> messageBroker : Создает / читает события
+
+@enduml
